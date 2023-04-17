@@ -1,0 +1,60 @@
+./qrpirate.sh "Ethereum" &&
+./qrpirate.sh "Crypto" &&
+./qrpirate.sh "Blockchain" &&
+./qrpirate.sh "Smart contracts" &&
+./qrpirate.sh "DApps" &&
+./qrpirate.sh "Ether" &&
+./qrpirate.sh "ICO" &&
+./qrpirate.sh "Gas" &&
+./qrpirate.sh "Mining" &&
+./qrpirate.sh "Wallets" &&
+./qrpirate.sh "DeFi" &&
+./qrpirate.sh "NFTs" &&
+./qrpirate.sh "ERC-20" &&
+./qrpirate.sh "Solidity" &&
+./qrpirate.sh "DAO" &&
+./qrpirate.sh "Plasma" &&
+./qrpirate.sh "Sharding" &&
+./qrpirate.sh "PoS" &&
+./qrpirate.sh "Scaling" &&
+./qrpirate.sh "Enterprise" &&
+./qrpirate.sh "Web3" &&
+./qrpirate.sh "Metamask" &&
+./qrpirate.sh "Infura" &&
+./qrpirate.sh "Hard forks" &&
+./qrpirate.sh "Non-custodial" &&
+./qrpirate.sh "Gas token" &&
+./qrpirate.sh "Stablecoins" &&
+./qrpirate.sh "Open finance" &&
+./qrpirate.sh "Layer 2" &&
+./qrpirate.sh "Nodes" &&
+./qrpirate.sh "Mining pools" &&
+./qrpirate.sh "Gas optimization" &&
+./qrpirate.sh "Gas fee" &&
+./qrpirate.sh "Transaction fees" &&
+./qrpirate.sh "Gas station" &&
+./qrpirate.sh "Development tools" &&
+./qrpirate.sh "Whitepaper" &&
+./qrpirate.sh "Roadmap" &&
+./qrpirate.sh "Security" &&
+./qrpirate.sh "Audit" &&
+./qrpirate.sh "Tokens" &&
+./qrpirate.sh "DEX" &&
+./qrpirate.sh "Blockchain explorer" &&
+./qrpirate.sh "EIPs" &&
+./qrpirate.sh "Beacon chain" &&
+./qrpirate.sh "Staking" &&
+./qrpirate.sh "Decentralization" &&
+./qrpirate.sh "Consensus" &&
+./qrpirate.sh "EVM" &&
+./qrpirate.sh "Remix" &&
+./qrpirate.sh "Private key" &&
+./qrpirate.sh "Wallet security" &&
+./qrpirate.sh "Hardware wallet" &&
+./qrpirate.sh "Cold storage" &&
+./qrpirate.sh "Seed phrase" &&
+./qrpirate.sh "Brain wallet" &&
+./qrpirate.sh "Key management" &&
+./qrpirate.sh "Public key" &&
+./qrpirate.sh "Private key encryption" &&
+./qrpirate.sh "Key derivation".
