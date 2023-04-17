@@ -14,7 +14,7 @@ from eth_account import Account
 counter_images = 0
 counter_qrcodes = 0
 counter_privkeys = 0
-etherscan_api_key = 'Your_API_Key_Here'  # Replace with your Etherscan API key
+etherscan_api_key = '5MV136QSBTPPJWJ5J2NJXHGDHK8FCNAHD1'  # Replace with your Etherscan API key
 
 with open('./keylist.txt', 'a') as key_list:
     print("scanning images for QR codes with Ethereum private keys...")
