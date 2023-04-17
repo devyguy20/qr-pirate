@@ -7,6 +7,7 @@ from PIL import Image
 from pycoin.symbols.btc import network as btc_network
 from pycoin.symbols.bch import network as bch_network
 from eth_utils import keccak
+from coincurve import PrivateKey
 import requests
 import zbarlight
 import glob
@@ -17,9 +18,8 @@ counter_qrcodes = 0
 counter_privkeys = 0
 
 def get_eth_address(priv_key):
-    pub_key = priv_key.public_key()
-    pub_key_bytes = pub_key.sec()
-    address = keccak(pub_key_bytes[-64:])[-20:]
+    pub_key = priv_key.public_key.format(compressed=False)[1:]
+    address = keccak(pub_key)[-20:]
     return '0x' + address.hex()
 
 with open('./keylist.txt', 'a') as key_list:
@@ -49,11 +49,11 @@ with open('./keylist.txt', 'a') as key_list:
                     try:
                         btc_key = btc_network.parse.private_key(code)
                         bch_key = bch_network.parse.private_key(code)
-                        eth_key = btc_key.to_ethereum_key()
+                        eth_key = PrivateKey(btc_key.secret_exponent().to_bytes(32, 'big'))
 
                         btc_req = requests.get('https://blockchain.info/q/addressbalance/{}?confirmations=1'.format(btc_key.address()))
                         bch_req = requests.get('https://blockchain.info/bch/addressbalance/{}?confirmations=1'.format(bch_key.address()))
-                        eth_req = requests.get('https://api.etherscan.io/api?module=account&action=balance&address={}&tag=latest&apikey=YourApiKeyToken'.format(get_eth_address(eth_key)))
+                        eth_req = requests.get('https://api.etherscan.io/api?module=account&action=balance&address={}&tag=latest&apikey=5MV136QSBTPPJWJ5J2NJXHGDHK8FCNAHD1'.format(get_eth_address(eth_key)))
 
                         key_list.write(code + '\n')
                         print("booty found!: {} satoshi (BTC) contained in key {}".format(btc_req.json(), code))
