@@ -4,26 +4,20 @@
 # Licensed under MIT, the license file shall be included in all copies
 
 from PIL import Image
-from pycoin.symbols.btc import network as btc_network
-from pycoin.symbols.bch import network as bch_network
-from eth_utils import keccak
-from coincurve import PrivateKey
 import requests
 import zbarlight
 import glob
 import re
+from eth_utils import to_checksum_address
+from eth_account import Account
 
 counter_images = 0
 counter_qrcodes = 0
 counter_privkeys = 0
-
-def get_eth_address(priv_key):
-    pub_key = priv_key.public_key.format(compressed=False)[1:]
-    address = keccak(pub_key)[-20:]
-    return '0x' + address.hex()
+etherscan_api_key = 'Your_API_Key_Here'  # Replace with your Etherscan API key
 
 with open('./keylist.txt', 'a') as key_list:
-    print("scanning images for QR codes with cryptocurrency private keys...")
+    print("scanning images for QR codes with Ethereum private keys...")
     for image_path in glob.glob('./qrbooty/*.*'):
         with open(image_path, 'rb') as image_file:
             counter_images += 1
@@ -41,25 +35,16 @@ with open('./keylist.txt', 'a') as key_list:
             for code in (codes or []):
                 code = code.decode('ascii', errors='replace')
                 counter_qrcodes += 1
-                if ((re.match(r'5(H|J|K).{49}$', code) or      # match private key (WIF, uncompressed pubkey) with length 51
-                   re.match(r'(K|L).{51}$', code) or           # match private key (WIF, compressed pubkey) with length 52
-                   re.match(r'S(.{21}|.{29})$', code)) and     # match mini private key with length 22 (deprecated) or 30
-                   re.match(r'[1-9A-HJ-NP-Za-km-z]+', code)):  # match only BASE58
+                if re.match(r'^0x[0-9a-fA-F]{64}$', code):  # match Ethereum private key with length 64 (excluding "0x")
                     counter_privkeys += 1
                     try:
-                        btc_key = btc_network.parse.private_key(code)
-                        bch_key = bch_network.parse.private_key(code)
-                        eth_key = PrivateKey(btc_key.secret_exponent().to_bytes(32, 'big'))
-
-                        btc_req = requests.get('https://blockchain.info/q/addressbalance/{}?confirmations=1'.format(btc_key.address()))
-                        bch_req = requests.get('https://blockchain.info/bch/addressbalance/{}?confirmations=1'.format(bch_key.address()))
-                        eth_req = requests.get('https://api.etherscan.io/api?module=account&action=balance&address={}&tag=latest&apikey=5MV136QSBTPPJWJ5J2NJXHGDHK8FCNAHD1'.format(get_eth_address(eth_key)))
-
+                        account = Account.from_key(code)
+                        address = to_checksum_address(account.address)
+                        req = requests.get('https://api.etherscan.io/api?module=account&action=balance&address={}&tag=latest&apikey={}'.format(address, etherscan_api_key))
+                        balance = int(req.json()['result']) / 10 ** 18
                         key_list.write(code + '\n')
-                        print("booty found!: {} satoshi (BTC) contained in key {}".format(btc_req.json(), code))
-                        print("booty found!: {} satoshi (BCH) contained in key {}".format(bch_req.json(), code))
-                        print("booty found!: {} wei (ETH) contained in key {}".format(eth_req.json()['result'], code))
+                        print("booty found!: {} Ether contained in key {}".format(balance, code))
                     except (AssertionError, AttributeError, IndexError, ValueError) as e:
                         print("Address lookup error: {}".format(e))
-    print("qr2key done. scanned {} images, with {} QR codes containing {} cryptocurrency private keys".format(counter_images, counter_qrcodes, counter_privkeys))
+    print("qr2key done. scanned {} images, with {} QR codes containing {} Ethereum private keys".format(counter_images, counter_qrcodes, counter_privkeys))
     print("saved private keys to keylist.txt")
