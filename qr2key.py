@@ -4,7 +4,9 @@
 # Licensed under MIT, the license file shall be included in all copies
 
 from PIL import Image
-from pycoin.symbols.btc import network
+from pycoin.symbols.btc import network as btc_network
+from pycoin.symbols.bch import network as bch_network
+from eth_utils import keccak
 import requests
 import zbarlight
 import glob
@@ -14,8 +16,14 @@ counter_images = 0
 counter_qrcodes = 0
 counter_privkeys = 0
 
+def get_eth_address(priv_key):
+    pub_key = priv_key.public_key()
+    pub_key_bytes = pub_key.sec()
+    address = keccak(pub_key_bytes[-64:])[-20:]
+    return '0x' + address.hex()
+
 with open('./keylist.txt', 'a') as key_list:
-    print("scanning images for QR codes with bitcoin private keys...")
+    print("scanning images for QR codes with cryptocurrency private keys...")
     for image_path in glob.glob('./qrbooty/*.*'):
         with open(image_path, 'rb') as image_file:
             counter_images += 1
@@ -39,11 +47,19 @@ with open('./keylist.txt', 'a') as key_list:
                    re.match(r'[1-9A-HJ-NP-Za-km-z]+', code)):  # match only BASE58
                     counter_privkeys += 1
                     try:
-                        key = network.parse.private_key(code)
-                        req = requests.get('https://blockchain.info/q/addressbalance/{}?confirmations=1'.format(key.address()))
+                        btc_key = btc_network.parse.private_key(code)
+                        bch_key = bch_network.parse.private_key(code)
+                        eth_key = btc_key.to_ethereum_key()
+
+                        btc_req = requests.get('https://blockchain.info/q/addressbalance/{}?confirmations=1'.format(btc_key.address()))
+                        bch_req = requests.get('https://blockchain.info/bch/addressbalance/{}?confirmations=1'.format(bch_key.address()))
+                        eth_req = requests.get('https://api.etherscan.io/api?module=account&action=balance&address={}&tag=latest&apikey=YourApiKeyToken'.format(get_eth_address(eth_key)))
+
                         key_list.write(code + '\n')
-                        print("booty found!: {} satoshi contained in key {}".format(req.json(), code))
+                        print("booty found!: {} satoshi (BTC) contained in key {}".format(btc_req.json(), code))
+                        print("booty found!: {} satoshi (BCH) contained in key {}".format(bch_req.json(), code))
+                        print("booty found!: {} wei (ETH) contained in key {}".format(eth_req.json()['result'], code))
                     except (AssertionError, AttributeError, IndexError, ValueError) as e:
                         print("Address lookup error: {}".format(e))
-    print("qr2key done. scanned {} images, with {} QR codes containing {} bitcoin private keys".format(counter_images, counter_qrcodes, counter_privkeys))
+    print("qr2key done. scanned {} images, with {} QR codes containing {} cryptocurrency private keys".format(counter_images, counter_qrcodes, counter_privkeys))
     print("saved private keys to keylist.txt")
